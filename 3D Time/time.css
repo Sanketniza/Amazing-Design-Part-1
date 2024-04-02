@@ -1,0 +1,134 @@
+@import url('https://fonts.googleapis.com/css2?family=Major+Mono+Display&display=swap');
+
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  transform-style: preserve-3d;
+}
+
+body {
+  min-height: 100vh;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  background-color: black;
+  perspective: 1000px;
+  font-family: 'Major Mono Display', monospace;
+}
+
+.clock-container {
+  display: grid;
+  grid-template-columns: repeat(8,max-content);
+  grid-template-rows: repeat(2,max-content);
+  gap: 4vmin;
+}
+
+/* geometry */
+/* cube */
+[cube] {
+  --s: var(--size, 1rem);
+  width: var(--s);
+  height: var(--s);
+  display: grid;
+  grid-template: "center";
+  place-items: center;
+  outline: 2px solid transparent;
+}
+
+/* cube planes */
+[cube-plane] {
+  grid-area: center;
+  width: 100%;
+  height: 100%;
+  transform: 
+  translateX(var(--pl-tx, 0px)) translateY(var(--pl-ty, 0px)) translatez(var(--pl-tz, 0px)) 
+  rotateX(var(--pl-rx, 0deg)) rotateY(var(--pl-ry, 0deg)) rotateZ(var(--pl-rz, 0deg));
+  --half-neg: calc(var(--s) / -2 + 0.1px);
+  --half_pos: calc(var(--s) / 2 - 0.1px);
+}
+[cube-plane="front"]  { --pl-tz: var(--half_pos); }
+[cube-plane="back"]   { --pl-tz: var(--half-neg); }
+[cube-plane="left"]   { --pl-tx: var(--half_pos); --pl-ry: 90deg; }
+[cube-plane="right"]  { --pl-tx: var(--half-neg); --pl-ry: 90deg; }
+[cube-plane="bottom"] { --pl-ty: var(--half_pos); --pl-rx: 90deg; }
+[cube-plane="top"]    { --pl-ty: var(--half-neg); --pl-rx: 90deg; }
+
+
+/* styling */
+.die   { --size: 10vmin }
+.colon { --size: 3vmin }
+.colon.c1t, .colon.c2t { align-self: end  ; }
+.colon.c1b, .colon.c2b { align-self: start; }
+
+/* planes */
+.colon [cube-plane] {
+  background: rgba(50,50,50);
+}
+.die [cube-plane] {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  padding: 20%;
+  gap: 10%; 
+  background: rgba(25,25,25);
+}
+
+/* numbers */
+.die i { 
+  background: var(--dotColor, grey); 
+  border-radius: 50%; 
+  grid-row: var(--gr); 
+  grid-column: var(--gc);
+}
+.die i.tl { --gr: 1; --gc: 1; }
+.die i.tc { --gr: 1; --gc: 2; }
+.die i.tr { --gr: 1; --gc: 3; }
+.die i.cl { --gr: 2; --gc: 1; }
+.die i.cc { --gr: 2; --gc: 2; }
+.die i.cr { --gr: 2; --gc: 3; }
+.die i.bl { --gr: 3; --gc: 1; }
+.die i.bc { --gr: 3; --gc: 2; }
+.die i.br { --gr: 3; --gc: 3; }
+
+/* die rotation */
+.die {
+  transform: rotateX(var(--rotateX,0deg)) rotateY(var(--rotateY, 0deg)) rotateZ(var(--rotateZ, 0deg));
+  transition: transform 0.25s ease
+}
+
+/* .die[data-nr="1"]{ } */
+.die[data-nr="2"] { --rotateX: -90deg } .die[data-nr="3"] { --rotateY: -90deg }
+.die[data-nr="4"] { --rotateY:  90deg } .die[data-nr="5"] { --rotateX:  90deg }
+.die[data-nr="6"] { --rotateX: 180deg } .die[data-nr="0"] { --rotateY: 180deg }
+.die[data-nr="0"] i { opacity: 0 }
+
+/* highlight front face*/
+.die[data-nr="1"] .nr1, .die[data-nr="2"] .nr2, .die[data-nr="3"] .nr3, .die[data-nr="4"] .nr4,
+.die[data-nr="5"] .nr5, .die[data-nr="6"] .nr6, .die[data-nr="0"] .nr6, .colon [cube-plane="front"]{ 
+  --dotColor: white;
+  background-image: linear-gradient(rgba(255,255,255,0.1),rgba(255,255,255,0.1));
+}
+
+/* time */
+.title, .time{
+  color: white;
+  font-size: 5vmin;
+  bottom: 3rem
+}
+.title { align-self: end;}
+.time { align-self: start;}
+
+/* zoom and rotation*/
+.clock-container{
+  transform: 
+    translateZ(calc(var(--clock-tz,0) * 1px)) 
+    rotateX(calc(var(--clock-rx,0) * 1deg))
+    rotateY(calc(var(--clock-ry,0) * 1deg));  
+}
+
+.clock-container.smooth-leave{
+  transition: transform 0.25s linear;
+}
